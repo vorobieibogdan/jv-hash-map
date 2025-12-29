@@ -28,15 +28,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> prev = null;
         while (current != null) {
-            if (keysEqual(current.key, key)) {
-                current.value = value; // replace value
+            if (keysEqual(current.getKey(), key)) {
+                current.setValue(value);
                 return;
             }
             prev = current;
-            current = current.next;
+            current = current.getNext();
         }
 
-        prev.next = new Node<>(key, value, null);
+        prev.setNext(new Node<>(key, value, null));
         size++;
     }
 
@@ -46,10 +46,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (keysEqual(current.key, key)) {
-                return current.value;
+            if (keysEqual(current.getKey(), key)) {
+                return current.getValue();
             }
-            current = current.next;
+            current = current.getNext();
         }
         return null;
     }
@@ -83,20 +83,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+                put(node.getKey(), node.getValue());
+                node = node.getNext();
             }
         }
     }
 
     private static class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
