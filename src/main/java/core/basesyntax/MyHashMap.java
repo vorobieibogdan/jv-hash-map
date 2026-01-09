@@ -13,11 +13,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if ((float) (size + 1) / table.length >= LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
 
-        int index = getIndex(key, table.length);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
 
         if (current == null) {
@@ -28,28 +28,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> prev = null;
         while (current != null) {
-            if (keysEqual(current.getKey(), key)) {
-                current.setValue(value);
+            if (keysEqual(current.key, key)) {
+                current.value = value;
                 return;
             }
             prev = current;
-            current = current.getNext();
+            current = current.next;
         }
 
-        prev.setNext(new Node<>(key, value, null));
+        prev.next = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key, table.length);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (keysEqual(current.getKey(), key)) {
-                return current.getValue();
+            if (keysEqual(current.key, key)) {
+                return current.value;
             }
-            current = current.getNext();
+            current = current.next;
         }
         return null;
     }
@@ -59,15 +59,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key, int length) {
+    private int getIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % length;
+        return (table.length - 1) & key.hashCode();
     }
 
     private boolean keysEqual(K k1, K k2) {
-        if (k1 == null && k2 == null) {
+        if (k1 == k2) {
             return true;
         }
         if (k1 == null || k2 == null) {
@@ -83,8 +83,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.getKey(), node.getValue());
-                node = node.getNext();
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
@@ -99,27 +99,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
-        }
     }
 }
-
 
